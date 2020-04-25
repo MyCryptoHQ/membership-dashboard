@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src/",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "lib": ["dom", "es2017", "dom.iterable"],
+    "target": "es2017",
+    "jsx": "react",
+    "allowJs": true,
+    "noEmitOnError": false,
+    "strict": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "types": [ "node" ]
+  },
+  "include": [
+    "./src/**/*",
+    "./gatsby/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

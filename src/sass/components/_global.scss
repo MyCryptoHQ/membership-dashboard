@@ -1,0 +1,20 @@
+html, body {
+    margin: 0;
+}
+
+html {
+    font-family: Lato, sans-serif;
+}
+
+.ant-layout {
+    min-height: 100vh;
+}
+
+footer .ant-menu-item .anticon {
+    margin-right: 0px;
+    font-size: 18px;
+}
+
+button i.anticon {
+    vertical-align: text-bottom;
+}

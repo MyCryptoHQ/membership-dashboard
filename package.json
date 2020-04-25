@@ -1,0 +1,100 @@
+{
+  "name": "@mycrypto/membership-dashboard",
+  "description": "MyCrypto Membership Dashboard",
+  "version": "1.0.0",
+  "author": "Luit Hollander <luit@hollander.email> (https://luit.me)",
+  "homepage": "https://memberships.mycryptoapi.com",
+  "repository": "https://github.com/MrLuit/membership-dashboard.git",
+  "license": "MIT",
+  "scripts": {
+    "tscheck": "tsc --noEmit --project tsconfig.json",
+    "tslint": "tslint --project .",
+    "build": "cross-env NODE_ENV=production rimraf ./.cache && rimraf ./public && gatsby build",
+    "dev": "cross-env NODE_ENV=development rimraf ./.cache && gatsby develop",
+    "serve": "gatsby serve",
+    "clean": "rimraf ./.cache && rimraf ./public",
+    "prettier:diff": "prettier --write --config ./.prettierrc --list-different \"src/**/*.ts\" \"src/**/*.tsx\" \"*.js\" \"gatsby/**/*.js\""
+  },
+  "dependencies": {
+    "@babel/core": "7.4.0",
+    "@babel/plugin-proposal-class-properties": "7.4.0",
+    "@babel/plugin-syntax-dynamic-import": "7.2.0",
+    "@babel/polyfill": "7.4.0",
+    "@babel/preset-env": "7.4.2",
+    "@babel/preset-react": "7.0.0",
+    "@babel/runtime": "7.7.2",
+    "antd": "3.26.13",
+    "axios": "0.19.2",
+    "babel-plugin-import": "1.12.1",
+    "babel-plugin-styled-components": "1.10.0",
+    "bottleneck": "2.19.5",
+    "ethereum-blockies-base64": "1.0.2",
+    "ethers": "4.0.46",
+    "gatsby": "2.18.16",
+    "gatsby-image": "2.0.34",
+    "gatsby-node-helpers": "0.3.0",
+    "gatsby-plugin-antd": "2.0.2",
+    "gatsby-plugin-less": "3.0.14",
+    "gatsby-plugin-manifest": "2.0.24",
+    "gatsby-plugin-react-helmet": "3.0.10",
+    "gatsby-plugin-remove-trailing-slashes": "2.1.7",
+    "gatsby-plugin-robots-txt": "1.4.0",
+    "gatsby-plugin-sass": "2.0.11",
+    "gatsby-plugin-sharp": "2.0.30",
+    "gatsby-plugin-sitemap": "2.2.14",
+    "gatsby-plugin-styled-components": "3.0.7",
+    "gatsby-plugin-typescript": "2.0.11",
+    "gatsby-source-filesystem": "2.0.29",
+    "gatsby-transformer-sharp": "2.1.17",
+    "less": "3.10.3",
+    "moment": "2.24.0",
+    "node-sass": "4.11.0",
+    "react": "16.8.5",
+    "react-dom": "16.8.5",
+    "react-helmet": "5.2.1",
+    "react-redux": "7.2.0",
+    "redux": "4.0.5",
+    "redux-logger": "3.0.6",
+    "redux-persist": "6.0.0",
+    "source-map-support": "0.5.11",
+    "styled-components": "4.0.2",
+    "ts-node": "8.0.3",
+    "typeface-lato": "0.0.54"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "7.6.2",
+    "@types/node": "11.11.6",
+    "@types/react": "16.8.8",
+    "@types/react-helmet": "5.0.8",
+    "@types/redux-logger": "3.0.7",
+    "@types/styled-components": "4.0.2",
+    "cross-env": "7.0.2",
+    "husky": "1.3.1",
+    "lint-staged": "8.1.5",
+    "prettier": "1.16.4",
+    "rimraf": "2.6.3",
+    "tslint": "5.14.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-microsoft-contrib": "6.1.0",
+    "tslint-react": "3.6.0",
+    "typescript": "3.3.4000"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write --config ./.prettierrc --config-precedence file-override",
+      "tslint --project .",
+      "git add"
+    ],
+    "*.js": [
+      "prettier --write --config ./.prettierrc --config-precedence file-override",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "post-commit": "git update-index --again",
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run tslint && npm run tscheck"
+    }
+  }
+}
