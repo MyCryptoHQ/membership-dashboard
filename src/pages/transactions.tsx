@@ -23,7 +23,8 @@ const Transactions: FunctionComponent = () => {
     const [hashSearch, setHashSearch] = useState(false);
     const [searchText, setSearchText] = useState('');
     const searchInput: any = createRef();
-    const hash = location.hash.replace('#', '');
+    const isSSR = typeof window === 'undefined';
+    const hash = !isSSR ? location.hash.replace('#', '') : '';
 
     const updateData = () => {
         setLoading(true);
@@ -48,10 +49,10 @@ const Transactions: FunctionComponent = () => {
     };
 
     if (searchText) {
-        if (hash !== searchText) {
+        if (hash !== searchText && !isSSR) {
             location.hash = `#${searchText}`;
         }
-    } else if (hashSearch && (hash || location.href.endsWith('#'))) {
+    } else if (!isSSR && hashSearch && (hash || location.href.endsWith('#'))) {
         history.replaceState(null, '', ' ');
     }
 
