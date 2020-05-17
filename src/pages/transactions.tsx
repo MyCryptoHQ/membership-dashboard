@@ -56,7 +56,7 @@ const Transactions: FunctionComponent = () => {
         history.replaceState(null, '', ' ');
     }
 
-    if (location.hash && !hashSearch) {
+    if (!isSSR && location.hash && !hashSearch) {
         setHashSearch(true);
         setSearchText(hash);
     }
