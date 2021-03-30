@@ -1,6 +1,8 @@
 import { Action } from 'redux';
+import { Network } from '../../data/contracts';
 
 interface Membership {
+    network: Network;
     transactionHash: string;
     address: string;
     contractAddress: string;

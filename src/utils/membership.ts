@@ -1,5 +1,5 @@
 import { ethers, utils } from 'ethers';
-import { memberships } from '../data/contracts';
+import { Network, memberships } from '../data/contracts';
 import ABI from '../data/abi.json';
 import axios from 'axios';
 import Bottleneck from 'bottleneck';
@@ -10,9 +10,7 @@ const limiter = new Bottleneck({
 });
 
 const provider = new ethers.providers.JsonRpcProvider('https://api.mycryptoapi.com/eth');
-const contracts = memberships.map(
-    membershipType => new ethers.Contract(membershipType.contractAddress, ABI, provider)
-);
+const contracts = memberships; //.map(membershipType => new ethers.Contract(membershipType.contractAddress, ABI, provider));
 
 const getMembershipOwnerAddresses = async (contract, page: number = 0) => {
     const pageSize = 100;
@@ -59,34 +57,78 @@ export const getOwners = async () => {
 export const getMemberships = async () => {
     const membershipsResult: any = [];
     await Promise.all(
-        contracts.map(async contract => {
-            const url = `https://etherscan.mycryptoapi.com/${contract.address}`;
-            const response: any = await limiter.schedule(() => axios.get(url));
-            if (response.data && response.data.result && response.data.result.length > 0) {
-                response.data.result.forEach(result => {
-                    if (
-                        result.topics[1] ===
-                        '0x0000000000000000000000000000000000000000000000000000000000000000'
-                    ) {
-                        const contractDetails: any = memberships.find(
-                            membershipType => membershipType.contractAddress === contract.address
-                        );
-                        const receiver = utils.getAddress(`0x${result.topics[2].substr(26, 44)}`);
-                        const timestamp = utils.bigNumberify(result.timeStamp).toNumber();
-                        const expiration =
-                            timestamp + contractDetails.durationInDays * 24 * 60 * 60;
-                        const membership = {
-                            transactionHash: result.transactionHash,
-                            address: receiver,
-                            contractAddress: contract.address,
-                            timestamp,
-                            expiration
-                        };
-                        membershipsResult.push(membership);
-                    }
-                });
-            }
-        })
+        contracts
+            .filter(contract => contract.network === 'mainnet')
+            .map(async contract => {
+                const url = `https://etherscan.mycryptoapi.com/${contract.contractAddress}`;
+                const response: any = await limiter.schedule(() => axios.get(url));
+                if (response.data && response.data.result && response.data.result.length > 0) {
+                    response.data.result.forEach(result => {
+                        if (
+                            result.topics[1] ===
+                            '0x0000000000000000000000000000000000000000000000000000000000000000'
+                        ) {
+                            const contractDetails: any = memberships.find(
+                                membershipType =>
+                                    membershipType.contractAddress === contract.contractAddress
+                            );
+                            const receiver = utils.getAddress(
+                                `0x${result.topics[2].substr(26, 44)}`
+                            );
+                            const timestamp = utils.bigNumberify(result.timeStamp).toNumber();
+                            const expiration =
+                                timestamp + contractDetails.durationInDays * 24 * 60 * 60;
+                            const membership = {
+                                network: contract.network,
+                                transactionHash: result.transactionHash,
+                                address: receiver,
+                                contractAddress: contract.contractAddress,
+                                timestamp,
+                                expiration
+                            };
+                            membershipsResult.push(membership);
+                        }
+                    });
+                }
+            })
+    );
+    await Promise.all(
+        contracts
+            .filter(contract => contract.network === 'xdai')
+            .map(async contract => {
+                const url = `https://blockscout.com/xdai/mainnet/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&address=${
+                    contract.contractAddress
+                }`;
+                const response: any = await limiter.schedule(() => axios.get(url));
+                if (response.data && response.data.result && response.data.result.length > 0) {
+                    response.data.result.forEach(result => {
+                        if (
+                            result.topics[1] ===
+                            '0x0000000000000000000000000000000000000000000000000000000000000000'
+                        ) {
+                            const contractDetails: any = memberships.find(
+                                membershipType =>
+                                    membershipType.contractAddress === contract.contractAddress
+                            );
+                            const receiver = utils.getAddress(
+                                `0x${result.topics[2].substr(26, 44)}`
+                            );
+                            const timestamp = utils.bigNumberify(result.timeStamp).toNumber();
+                            const expiration =
+                                timestamp + contractDetails.durationInDays * 24 * 60 * 60;
+                            const membership = {
+                                network: contract.network,
+                                transactionHash: result.transactionHash,
+                                address: receiver,
+                                contractAddress: contract.contractAddress,
+                                timestamp,
+                                expiration
+                            };
+                            membershipsResult.push(membership);
+                        }
+                    });
+                }
+            })
     );
     return membershipsResult;
 };

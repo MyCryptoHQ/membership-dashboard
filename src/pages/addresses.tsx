@@ -121,7 +121,9 @@ const Transactions: FunctionComponent = () => {
                                     }
                                 },
 
-                                render: address => <Address address={address} />
+                                render: (address, record) => (
+                                    <Address network={record.network} address={address} />
+                                )
                             },
                             {
                                 title: 'Active',
@@ -185,6 +187,7 @@ const Transactions: FunctionComponent = () => {
                                 return {
                                     key: index,
                                     address,
+                                    network: 'mainnet',
                                     active: addressMemberships.some(
                                         addressMembership =>
                                             addressMembership.expiration * 1000 > Date.now()

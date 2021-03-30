@@ -80,8 +80,14 @@ const Transactions: FunctionComponent = () => {
                             {
                                 title: 'Transaction',
                                 dataIndex: 'transactionHash',
-                                render: transactionhash => (
-                                    <ExternalLink to={`https://etherscan.io/tx/${transactionhash}`}>
+                                render: (transactionhash, record) => (
+                                    <ExternalLink
+                                        to={
+                                            record.network === 'mainnet'
+                                                ? `https://etherscan.io/tx/${transactionhash}`
+                                                : `https://blockscout.com/xdai/mainnet/tx/${transactionhash}`
+                                        }
+                                    >
                                         {transactionhash.substr(0, 12)}...
                                     </ExternalLink>
                                 )
@@ -148,7 +154,9 @@ const Transactions: FunctionComponent = () => {
                                     }
                                 },
 
-                                render: address => <Address address={address} />
+                                render: (address, record) => (
+                                    <Address network={record.network} address={address} />
+                                )
                             },
                             {
                                 title: 'Membership',

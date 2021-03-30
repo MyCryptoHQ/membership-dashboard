@@ -4,11 +4,18 @@ import makeBlockie from 'ethereum-blockies-base64';
 
 interface Props {
     address: string;
+    network?: 'mainnet' | 'xdai';
 }
 
-const Address: FunctionComponent<Props> = ({ address }) => (
+const Address: FunctionComponent<Props> = ({ network, address }) => (
     <Fragment>
-        <ExternalLink to={`https://etherscan.io/address/${address}`}>
+        <ExternalLink
+            to={
+                network && network === 'xdai'
+                    ? `https://blockscout.com/poa/xdai/address/${address}`
+                    : `https://etherscan.io/address/${address}`
+            }
+        >
             <img
                 style={{
                     width: '16px',
