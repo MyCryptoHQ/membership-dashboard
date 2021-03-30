@@ -1,6 +1,6 @@
-import { ethers, utils } from 'ethers';
-import { Network, memberships } from '../data/contracts';
-import ABI from '../data/abi.json';
+import { /*ethers,*/ utils } from 'ethers';
+import { /*Network, */ memberships } from '../data/contracts';
+//import ABI from '../data/abi.json';
 import axios from 'axios';
 import Bottleneck from 'bottleneck';
 
@@ -9,7 +9,7 @@ const limiter = new Bottleneck({
     maxConcurrent: 1
 });
 
-const provider = new ethers.providers.JsonRpcProvider('https://api.mycryptoapi.com/eth');
+//const provider = new ethers.providers.JsonRpcProvider('https://api.mycryptoapi.com/eth');
 const contracts = memberships; //.map(membershipType => new ethers.Contract(membershipType.contractAddress, ABI, provider));
 
 const getMembershipOwnerAddresses = async (contract, page: number = 0) => {
@@ -23,7 +23,7 @@ const getMembershipOwnerAddresses = async (contract, page: number = 0) => {
     }
 };
 
-const getMembershipOwners = async contract => {
+/*const getMembershipOwners = async contract => {
     const ownerAddresses = await getMembershipOwnerAddresses(contract);
     const owners = await Promise.all(
         ownerAddresses.map(async address => {
@@ -52,7 +52,7 @@ export const getOwners = async () => {
         })
     );
     return owners;
-};
+};*/
 
 export const getMemberships = async () => {
     const membershipsResult: any = [];

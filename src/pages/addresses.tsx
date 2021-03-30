@@ -187,7 +187,7 @@ const Transactions: FunctionComponent = () => {
                                 return {
                                     key: index,
                                     address,
-                                    network: 'mainnet',
+                                    network: 'mainnet' as any,
                                     active: addressMemberships.some(
                                         addressMembership =>
                                             addressMembership.expiration * 1000 > Date.now()
