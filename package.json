@@ -48,7 +48,7 @@
     "gatsby-transformer-sharp": "2.1.17",
     "less": "3.10.3",
     "moment": "2.24.0",
-    "node-sass": "4.11.0",
+    "node-sass": "4.13.1",
     "react": "16.8.5",
     "react-dom": "16.8.5",
     "react-helmet": "5.2.1",
