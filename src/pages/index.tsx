@@ -2,11 +2,11 @@ import React, { FunctionComponent, useState } from 'react';
 import Layout from '../components/Layout';
 import MetaData from '../components/MetaData';
 import ExternalLink from '../components/ExternalLink';
-import { Row, Col, Table, Icon, Button, Typography } from 'antd';
+import { Row, Col, Table, Icon, Button, Typography, Progress } from 'antd';
 import { getMemberships } from '../utils/membership';
 import { memberships as membershipTypes } from '../data/contracts';
 import { useDispatch, useSelector } from '../hooks';
-import { updateMemberships } from '../store/memberships';
+import { updateMemberships, updateBlock } from '../store/memberships';
 
 import '../sass/index.scss';
 
@@ -16,13 +16,23 @@ const Index: FunctionComponent = () => {
     const dispatch = useDispatch();
     const memberships = useSelector(state => state.memberships.memberships);
     const updated = useSelector(state => state.memberships.updated);
+    const latestBlocks = useSelector(state => state.memberships.blocks);
     const [loading, setLoading] = useState(false);
 
     const updateData = () => {
-        setLoading(true);
-        getMemberships().then(result => {
-            dispatch(updateMemberships(result));
-            setLoading(false);
+        //setLoading(true);
+        getMemberships(
+            latestBlocks,
+            newMemberships => {
+                dispatch(updateMemberships(newMemberships));
+            },
+            (newNetwork, newBlock) => {
+                dispatch(updateBlock(newNetwork, newBlock));
+            }
+        ).then(result => {
+            //dispatch(updateMemberships(result));
+            //dispatch(updateBlock())
+            //setLoading(false);
         });
     };
 
@@ -36,14 +46,16 @@ const Index: FunctionComponent = () => {
             <Row>
                 <Col offset={2} span={20}>
                     <Title level={2}>Overview</Title>
-                    <Button
-                        style={{ position: 'absolute', right: 0, top: 0 }}
-                        shape="circle"
-                        icon="reload"
-                        loading={loading}
-                        disabled={loading}
-                        onClick={updateData}
-                    />
+                    <span style={{ position: 'absolute', right: 0, top: 0 }}>
+                        <Button
+                            shape="circle"
+                            icon="reload"
+                            loading={loading}
+                            disabled={loading}
+                            onClick={updateData}
+                        />
+                    </span>
+                    <Progress style={{ width: '100%' }} />
                     <Table
                         pagination={false}
                         columns={[

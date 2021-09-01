@@ -13,6 +13,9 @@ interface Membership {
 export interface MembershipsState {
     memberships: Membership[];
     updated: number;
+    blocks: {
+        Network?: number;
+    };
 }
 
 export const UPDATE_MEMBERSHIPS = 'UPDATE_MEMBERSHIPS';
@@ -21,4 +24,11 @@ export interface UpdateMembershipsAction extends Action {
     memberships: Membership[];
 }
 
-export type MembershipsActions = UpdateMembershipsAction;
+export const UPDATE_BLOCK = 'UPDATE_BLOCK';
+export interface UpdateBlockAction extends Action {
+    type: typeof UPDATE_BLOCK;
+    network: Network;
+    block: number;
+}
+
+export type MembershipsActions = UpdateMembershipsAction | UpdateBlockAction;

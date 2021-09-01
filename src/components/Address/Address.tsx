@@ -7,15 +7,19 @@ interface Props {
     network?: 'mainnet' | 'xdai';
 }
 
+const getBlockExplorer = (network: string | undefined, address: string) => {
+    if (network === 'xdai') {
+        return `https://blockscout.com/poa/xdai/address/${address}`;
+    } else if (network === 'polygon') {
+        return `https://polygonscan.com/address/${address}`;
+    } else {
+        return `https://etherscan.io/address/${address}`;
+    }
+};
+
 const Address: FunctionComponent<Props> = ({ network, address }) => (
     <Fragment>
-        <ExternalLink
-            to={
-                network && network === 'xdai'
-                    ? `https://blockscout.com/poa/xdai/address/${address}`
-                    : `https://etherscan.io/address/${address}`
-            }
-        >
+        <ExternalLink to={getBlockExplorer(network, address)}>
             <img
                 style={{
                     width: '16px',

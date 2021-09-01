@@ -1,11 +1,12 @@
 import { /*ethers,*/ utils } from 'ethers';
 import { /*Network, */ memberships } from '../data/contracts';
+import { updateMemberships, updateBlock } from '../store/memberships';
 //import ABI from '../data/abi.json';
 import axios from 'axios';
 import Bottleneck from 'bottleneck';
 
 const limiter = new Bottleneck({
-    minTime: 100,
+    minTime: 500,
     maxConcurrent: 1
 });
 
@@ -54,7 +55,7 @@ export const getOwners = async () => {
     return owners;
 };*/
 
-export const getMemberships = async () => {
+export const getMemberships = async (startingBlocks, updateM: any, updateB: any) => {
     const membershipsResult: any = [];
     await Promise.all(
         contracts
@@ -94,9 +95,9 @@ export const getMemberships = async () => {
     );
     await Promise.all(
         contracts
-            .filter(contract => contract.network === 'xdai')
+            .filter(contract => contract.network === 'polygon')
             .map(async contract => {
-                const url = `https://blockscout.com/xdai/mainnet/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&address=${
+                const url = `https://api.polygonscan.com/api?module=logs&action=getLogs&fromBlock=0&toBlock=latest&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&apikey=XT96ZVQ4VCMJ8YZNFQHI7SG55TXJG53GIV&address=${
                     contract.contractAddress
                 }`;
                 const response: any = await limiter.schedule(() => axios.get(url));
@@ -130,5 +131,65 @@ export const getMemberships = async () => {
                 }
             })
     );
+    const url = `https://blockscout.com/xdai/mainnet/api?module=block&action=eth_block_number`;
+    const response: any = await limiter.schedule(() => axios.get(url));
+    const block = utils.bigNumberify(response.data.result).toNumber();
+    const blockCount = 100000;
+    for (let i = 0; i < block; i += blockCount) {
+        await Promise.all(
+            contracts
+                .filter(contract => contract.network === 'xdai')
+                .map(async contract => {
+                    const url = `https://blockscout.com/xdai/mainnet/api?module=logs&action=getLogs&fromBlock=${i}&toBlock=${i +
+                        blockCount}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&address=${
+                        contract.contractAddress
+                    }`;
+                    try {
+                        const response: any = await limiter.schedule(() => axios.get(url));
+                        if (
+                            response.data &&
+                            response.data.result &&
+                            response.data.result.length > 0
+                        ) {
+                            response.data.result.forEach(result => {
+                                if (
+                                    result.topics[1] ===
+                                    '0x0000000000000000000000000000000000000000000000000000000000000000'
+                                ) {
+                                    const contractDetails: any = memberships.find(
+                                        membershipType =>
+                                            membershipType.contractAddress ===
+                                            contract.contractAddress
+                                    );
+                                    const receiver = utils.getAddress(
+                                        `0x${result.topics[2].substr(26, 44)}`
+                                    );
+                                    const timestamp = utils
+                                        .bigNumberify(result.timeStamp)
+                                        .toNumber();
+                                    const expiration =
+                                        timestamp + contractDetails.durationInDays * 24 * 60 * 60;
+                                    const membership = {
+                                        network: contract.network,
+                                        transactionHash: result.transactionHash,
+                                        address: receiver,
+                                        contractAddress: contract.contractAddress,
+                                        timestamp,
+                                        expiration
+                                    };
+                                    membershipsResult.push(membership);
+                                    //dispatch(updateMemberships(membershipsResult));
+                                    //dispatch(updateBlock(i));
+                                }
+                            });
+                        }
+                        updateM(membershipsResult);
+                        updateB('xdai', i);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                })
+        );
+    }
     return membershipsResult;
 };
