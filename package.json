@@ -16,6 +16,7 @@
     "prettier:diff": "prettier --write --config ./.prettierrc --list-different \"src/**/*.ts\" \"src/**/*.tsx\" \"*.js\" \"gatsby/**/*.js\""
   },
   "dependencies": {
+    "@apollo/client": "3.4.10",
     "@babel/core": "7.4.0",
     "@babel/plugin-proposal-class-properties": "7.4.0",
     "@babel/plugin-syntax-dynamic-import": "7.2.0",
@@ -28,6 +29,7 @@
     "babel-plugin-import": "1.12.1",
     "babel-plugin-styled-components": "1.10.0",
     "bottleneck": "2.19.5",
+    "eslint-plugin-graphql": "2.1.1",
     "ethereum-blockies-base64": "1.0.2",
     "ethers": "4.0.46",
     "gatsby": "2.18.16",
@@ -46,6 +48,7 @@
     "gatsby-plugin-typescript": "2.0.11",
     "gatsby-source-filesystem": "2.0.29",
     "gatsby-transformer-sharp": "2.1.17",
+    "graphql": "15.5.2",
     "less": "3.10.3",
     "moment": "2.24.0",
     "node-sass": "4.11.0",

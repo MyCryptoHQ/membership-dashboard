@@ -1,39 +1,51 @@
 import React, { FunctionComponent, Fragment } from 'react';
 import ExternalLink from '../ExternalLink';
 import makeBlockie from 'ethereum-blockies-base64';
+import networks from '../../data/networks';
+import { Network } from '../../data/contracts';
 
 interface Props {
     address: string;
-    network?: 'mainnet' | 'xdai';
+    network?: Network;
 }
 
-const getBlockExplorer = (network: string | undefined, address: string) => {
-    if (network === 'xdai') {
-        return `https://blockscout.com/poa/xdai/address/${address}`;
-    } else if (network === 'polygon') {
-        return `https://polygonscan.com/address/${address}`;
+const Address: FunctionComponent<Props> = ({ network, address }) => {
+    const networkData: any = networks.find(item => item.id === network);
+    if (network) {
+        return (
+            <ExternalLink to={`${networkData.explorer}${address}`}>
+                <img
+                    style={{
+                        width: '16px',
+                        height: '16px',
+                        borderRadius: '50%',
+                        verticalAlign: 'text-bottom'
+                    }}
+                    src={makeBlockie(address)}
+                />{' '}
+                <span className="ng-binding" style={{ marginLeft: '5px' }}>
+                    {address}
+                </span>
+            </ExternalLink>
+        );
     } else {
-        return `https://etherscan.io/address/${address}`;
+        return (
+            <Fragment>
+                <img
+                    style={{
+                        width: '16px',
+                        height: '16px',
+                        borderRadius: '50%',
+                        verticalAlign: 'text-bottom'
+                    }}
+                    src={makeBlockie(address)}
+                />{' '}
+                <span className="ng-binding" style={{ marginLeft: '5px' }}>
+                    {address}
+                </span>
+            </Fragment>
+        );
     }
 };
-
-const Address: FunctionComponent<Props> = ({ network, address }) => (
-    <Fragment>
-        <ExternalLink to={getBlockExplorer(network, address)}>
-            <img
-                style={{
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: '50%',
-                    verticalAlign: 'text-bottom'
-                }}
-                src={makeBlockie(address)}
-            />{' '}
-            <span className="ng-binding" style={{ marginLeft: '5px' }}>
-                {address}
-            </span>
-        </ExternalLink>
-    </Fragment>
-);
 
 export default Address;

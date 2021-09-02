@@ -24,15 +24,15 @@ const Transactions: FunctionComponent = () => {
     const searchInput: any = createRef();
 
     const updateData = () => {
-        setLoading(true);
+        /*setLoading(true);
         getMemberships().then(result => {
             dispatch(updateMemberships(result));
             setLoading(false);
-        });
+        });*/
     };
 
     if (!loading && Date.now() - updated > 30 * 1000) {
-        updateData();
+        //updateData();
     }
 
     const addresses: AddressMap = {};
@@ -50,14 +50,14 @@ const Transactions: FunctionComponent = () => {
             <Row>
                 <Col offset={2} span={20}>
                     <Title level={2}>Addresses</Title>
-                    <Button
+                    {/*<Button
                         style={{ position: 'absolute', right: 0, top: 0 }}
                         shape="circle"
                         icon="reload"
                         loading={loading}
                         disabled={loading}
                         onClick={updateData}
-                    />
+                    />*/}
                     <Table
                         columns={[
                             {
@@ -121,9 +121,7 @@ const Transactions: FunctionComponent = () => {
                                     }
                                 },
 
-                                render: (address, record) => (
-                                    <Address network={record.network} address={address} />
-                                )
+                                render: (address, record) => <Address address={address} />
                             },
                             {
                                 title: 'Active',
@@ -190,7 +188,7 @@ const Transactions: FunctionComponent = () => {
                                     network: 'mainnet' as any,
                                     active: addressMemberships.some(
                                         addressMembership =>
-                                            addressMembership.expiration * 1000 > Date.now()
+                                            addressMembership.expiration > Date.now()
                                     ),
                                     count: addressMemberships.length.toString()
                                 };

@@ -1,12 +1,13 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, Fragment, useState } from 'react';
 import Layout from '../components/Layout';
 import MetaData from '../components/MetaData';
 import ExternalLink from '../components/ExternalLink';
 import { Row, Col, Table, Icon, Button, Typography, Progress } from 'antd';
-import { getMemberships } from '../utils/membership';
+import { getMemberships, getBlocks } from '../utils/membership';
 import { memberships as membershipTypes } from '../data/contracts';
+import networks from '../data/networks';
 import { useDispatch, useSelector } from '../hooks';
-import { updateMemberships, updateBlock } from '../store/memberships';
+import { updateMemberships, updateCurrentBlock, updateLatestBlock } from '../store/memberships';
 
 import '../sass/index.scss';
 
@@ -16,23 +17,31 @@ const Index: FunctionComponent = () => {
     const dispatch = useDispatch();
     const memberships = useSelector(state => state.memberships.memberships);
     const updated = useSelector(state => state.memberships.updated);
-    const latestBlocks = useSelector(state => state.memberships.blocks);
+    const currentBlocks = useSelector(state => state.memberships.currentBlocks);
+    const latestBlocks = useSelector(state => state.memberships.latestBlocks);
     const [loading, setLoading] = useState(false);
 
     const updateData = () => {
-        //setLoading(true);
-        getMemberships(
-            latestBlocks,
-            newMemberships => {
-                dispatch(updateMemberships(newMemberships));
-            },
-            (newNetwork, newBlock) => {
-                dispatch(updateBlock(newNetwork, newBlock));
-            }
-        ).then(result => {
-            //dispatch(updateMemberships(result));
-            //dispatch(updateBlock())
-            //setLoading(false);
+        setLoading(true);
+        getBlocks().then(blocks => {
+            const latestBlocksNew: any = {};
+            blocks.forEach(block => {
+                latestBlocksNew[block.network] = block.block;
+                dispatch(updateLatestBlock(block.network, block.block));
+            });
+            getMemberships(
+                currentBlocks,
+                latestBlocksNew,
+                newMemberships => {
+                    dispatch(updateMemberships(newMemberships));
+                },
+                (newNetwork, newBlock) => {
+                    dispatch(updateCurrentBlock(newNetwork, newBlock));
+                }
+            ).then(result => {
+                setLoading(false);
+            });
+            //getMembershipsV2();
         });
     };
 
@@ -55,18 +64,42 @@ const Index: FunctionComponent = () => {
                             onClick={updateData}
                         />
                     </span>
-                    <Progress style={{ width: '100%' }} />
                     <Table
                         pagination={false}
                         columns={[
                             {
-                                title: 'Icon',
-                                dataIndex: 'icon',
-                                render: icon => <img width="16px" height="16px" src={icon} />
+                                title: 'Network',
+                                dataIndex: 'network',
+                                render: network => {
+                                    const networkData = networks.find(item => item.id === network);
+                                    if (!networkData) {
+                                        return <Fragment />;
+                                    }
+                                    return (
+                                        <Row type="flex" justify="space-around">
+                                            <Col span={6}>
+                                                <img
+                                                    width="20px"
+                                                    height="20px"
+                                                    src={networkData.icon}
+                                                />
+                                            </Col>
+                                            <Col span={18}>{networkData.name}</Col>
+                                        </Row>
+                                    );
+                                }
                             },
                             {
                                 title: 'Name',
-                                dataIndex: 'name'
+                                dataIndex: 'name',
+                                render: (name, item) => (
+                                    <Row type="flex" justify="space-around">
+                                        <Col span={4}>
+                                            <img width="20px" height="20px" src={item.icon} />
+                                        </Col>
+                                        <Col span={20}>{name}</Col>
+                                    </Row>
+                                )
                             },
                             {
                                 title: 'Active',
@@ -79,25 +112,35 @@ const Index: FunctionComponent = () => {
                             {
                                 title: 'Contract',
                                 dataIndex: 'contractAddress',
-                                render: contractAddress => (
-                                    <ExternalLink
-                                        to={`https://etherscan.io/address/${contractAddress}`}
-                                    >
-                                        <Icon type="link" />
-                                    </ExternalLink>
-                                )
+                                render: (contractAddress, item) => {
+                                    const networkData = networks.find(
+                                        entry => entry.id === item.network
+                                    );
+                                    if (!networkData) {
+                                        return <Fragment />;
+                                    }
+                                    return (
+                                        <ExternalLink
+                                            to={`${networkData.explorer}${contractAddress}`}
+                                        >
+                                            <Icon type="link" />
+                                        </ExternalLink>
+                                    );
+                                }
                             }
                         ]}
                         dataSource={membershipTypes.map((membershipType: any, index) => {
                             membershipType.key = index;
                             membershipType.activeCount = memberships.filter(
                                 membership =>
-                                    membership.contractAddress === membershipType.contractAddress &&
-                                    membership.expiration > Math.round(Date.now() / 1000)
+                                    membership.contractAddress.toLowerCase() ===
+                                        membershipType.contractAddress.toLowerCase() &&
+                                    membership.expiration > Date.now()
                             ).length;
                             membershipType.totalCount = memberships.filter(
                                 membership =>
-                                    membership.contractAddress === membershipType.contractAddress
+                                    membership.contractAddress.toLowerCase() ===
+                                    membershipType.contractAddress.toLowerCase()
                             ).length;
                             return membershipType;
                         })}

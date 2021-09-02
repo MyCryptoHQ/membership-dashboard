@@ -1,9 +1,11 @@
 import { ActionCreator } from 'redux';
 import {
     UPDATE_MEMBERSHIPS,
-    UPDATE_BLOCK,
+    UPDATE_CURRENT_BLOCK,
+    UPDATE_LATEST_BLOCK,
     UpdateMembershipsAction,
-    UpdateBlockAction
+    UpdateCurrentBlockAction,
+    UpdateLatestBlockAction
 } from './types';
 import { Network } from '../../data/contracts';
 
@@ -12,8 +14,20 @@ export const updateMemberships: ActionCreator<UpdateMembershipsAction> = (member
     memberships
 });
 
-export const updateBlock: ActionCreator<UpdateBlockAction> = (network: Network, block: number) => ({
-    type: UPDATE_BLOCK,
+export const updateCurrentBlock: ActionCreator<UpdateCurrentBlockAction> = (
+    network: Network,
+    block: number
+) => ({
+    type: UPDATE_CURRENT_BLOCK,
+    network,
+    block
+});
+
+export const updateLatestBlock: ActionCreator<UpdateLatestBlockAction> = (
+    network: Network,
+    block: number
+) => ({
+    type: UPDATE_LATEST_BLOCK,
     network,
     block
 });

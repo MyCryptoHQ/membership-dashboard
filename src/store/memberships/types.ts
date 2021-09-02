@@ -13,7 +13,10 @@ interface Membership {
 export interface MembershipsState {
     memberships: Membership[];
     updated: number;
-    blocks: {
+    currentBlocks: {
+        Network?: number;
+    };
+    latestBlocks: {
         Network?: number;
     };
 }
@@ -24,11 +27,21 @@ export interface UpdateMembershipsAction extends Action {
     memberships: Membership[];
 }
 
-export const UPDATE_BLOCK = 'UPDATE_BLOCK';
-export interface UpdateBlockAction extends Action {
-    type: typeof UPDATE_BLOCK;
+export const UPDATE_CURRENT_BLOCK = 'UPDATE_CURRENT_BLOCK';
+export interface UpdateCurrentBlockAction extends Action {
+    type: typeof UPDATE_CURRENT_BLOCK;
     network: Network;
     block: number;
 }
 
-export type MembershipsActions = UpdateMembershipsAction | UpdateBlockAction;
+export const UPDATE_LATEST_BLOCK = 'UPDATE_LATEST_BLOCK';
+export interface UpdateLatestBlockAction extends Action {
+    type: typeof UPDATE_LATEST_BLOCK;
+    network: Network;
+    block: number;
+}
+
+export type MembershipsActions =
+    | UpdateMembershipsAction
+    | UpdateCurrentBlockAction
+    | UpdateLatestBlockAction;

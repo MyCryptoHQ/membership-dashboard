@@ -1,10 +1,17 @@
 import { Reducer } from 'redux';
-import { UPDATE_MEMBERSHIPS, UPDATE_BLOCK, MembershipsActions, MembershipsState } from './types';
+import {
+    UPDATE_MEMBERSHIPS,
+    UPDATE_CURRENT_BLOCK,
+    UPDATE_LATEST_BLOCK,
+    MembershipsActions,
+    MembershipsState
+} from './types';
 
 const INITIAL_STATE: MembershipsState = {
     memberships: [],
     updated: 0,
-    blocks: {}
+    currentBlocks: {},
+    latestBlocks: {}
 };
 
 export const reducer: Reducer<MembershipsState, MembershipsActions> = (
@@ -18,11 +25,19 @@ export const reducer: Reducer<MembershipsState, MembershipsActions> = (
                 memberships: action.memberships,
                 updated: Date.now()
             };
-        case UPDATE_BLOCK:
+        case UPDATE_CURRENT_BLOCK:
             return {
                 ...state,
-                blocks: {
-                    ...state.blocks,
+                currentBlocks: {
+                    ...state.currentBlocks,
+                    [action.network]: action.block
+                }
+            };
+        case UPDATE_LATEST_BLOCK:
+            return {
+                ...state,
+                latestBlocks: {
+                    ...state.latestBlocks,
                     [action.network]: action.block
                 }
             };
