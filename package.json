@@ -49,6 +49,7 @@
     "gatsby-source-filesystem": "2.0.29",
     "gatsby-transformer-sharp": "2.1.17",
     "graphql": "15.5.2",
+    "js-file-download": "0.4.12",
     "less": "3.10.3",
     "moment": "2.24.0",
     "node-sass": "4.11.0",
