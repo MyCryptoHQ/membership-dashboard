@@ -6,7 +6,7 @@ interface Network {
     icon: any;
     id: string;
     name: string;
-    graph: string;
+    graph_uri: string;
     explorer: string;
 }
 
@@ -15,21 +15,21 @@ const networks: Network[] = [
         icon: Mainnet,
         id: 'mainnet',
         name: 'Mainnet',
-        graph: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/unlock',
+        graph_uri: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/unlock',
         explorer: 'https://etherscan.io/address/'
     },
     {
         icon: xDai,
         id: 'xdai',
         name: 'xDai',
-        graph: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/xdai',
+        graph_uri: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/xdai',
         explorer: 'https://blockscout.com/xdai/mainnet/address/'
     },
     {
         icon: Polygon,
         id: 'polygon',
         name: 'Polygon',
-        graph: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/polygon',
+        graph_uri: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/polygon',
         explorer: 'https://polygonscan.com/address/'
     }
 ];
