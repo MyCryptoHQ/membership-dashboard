@@ -1,14 +1,11 @@
 import React, { FunctionComponent, useState, createRef, Fragment } from 'react';
 import Layout from '../components/Layout';
 import MetaData from '../components/MetaData';
-import ExternalLink from '../components/ExternalLink';
 import Address from '../components/Address';
 import { Row, Col, Table, Input, Button, Icon, Typography } from 'antd';
-import { getMemberships } from '../utils/membership';
 import { memberships as membershipTypes } from '../data/contracts';
 import networks from '../data/networks';
-import { useDispatch, useSelector } from '../hooks';
-import { updateMemberships } from '../store/memberships';
+import { useSelector } from '../hooks';
 
 import moment from 'moment';
 
@@ -17,27 +14,12 @@ import '../sass/index.scss';
 const { Title } = Typography;
 
 const Transactions: FunctionComponent = () => {
-    const dispatch = useDispatch();
     const memberships = useSelector(state => state.memberships.memberships);
-    const updated = useSelector(state => state.memberships.updated);
-    const [loading, setLoading] = useState(false);
     const [hashSearch, setHashSearch] = useState(false);
     const [searchText, setSearchText] = useState('');
     const searchInput: any = createRef();
     const isSSR = typeof window === 'undefined';
     const hash = !isSSR ? location.hash.replace('#', '') : '';
-
-    const updateData = () => {
-        /*setLoading(true);
-        getMemberships().then(result => {
-            dispatch(updateMemberships(result));
-            setLoading(false);
-        });*/
-    };
-
-    if (!loading && Date.now() - updated > 30 * 1000) {
-        //updateData();
-    }
 
     const handleSearch = (selectedKeys, confirm) => {
         confirm();

@@ -6,9 +6,8 @@ interface Network {
     icon: any;
     id: string;
     name: string;
-    node: string;
+    graph: string;
     explorer: string;
-    interval: number;
 }
 
 const networks: Network[] = [
@@ -16,25 +15,22 @@ const networks: Network[] = [
         icon: Mainnet,
         id: 'mainnet',
         name: 'Mainnet',
-        node: 'https://mainnet.infura.io/v3/f3b4711ae677488bb3c56de93c6cab1a',
-        explorer: 'https://etherscan.io/address/',
-        interval: 1000000
+        graph: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/unlock',
+        explorer: 'https://etherscan.io/address/'
     },
     {
         icon: xDai,
         id: 'xdai',
         name: 'xDai',
-        node: 'https://rpc.xdaichain.com/',
-        explorer: 'https://blockscout.com/xdai/mainnet/address/',
-        interval: 10000
+        graph: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/xdai',
+        explorer: 'https://blockscout.com/xdai/mainnet/address/'
     },
     {
         icon: Polygon,
         id: 'polygon',
         name: 'Polygon',
-        node: 'https://rpc-mainnet.matic.quiknode.pro',
-        explorer: 'https://polygonscan.com/address/',
-        interval: 5000000
+        graph: 'https://api.thegraph.com/subgraphs/name/unlock-protocol/polygon',
+        explorer: 'https://polygonscan.com/address/'
     }
 ];
 

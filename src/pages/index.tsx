@@ -2,12 +2,12 @@ import React, { FunctionComponent, Fragment, useState } from 'react';
 import Layout from '../components/Layout';
 import MetaData from '../components/MetaData';
 import ExternalLink from '../components/ExternalLink';
-import { Row, Col, Table, Icon, Button, Typography, Progress } from 'antd';
-import { getMemberships, getBlocks } from '../utils/membership';
+import { Row, Col, Table, Icon, Button, Typography } from 'antd';
+import { getMemberships } from '../utils/membership';
 import { memberships as membershipTypes } from '../data/contracts';
 import networks from '../data/networks';
 import { useDispatch, useSelector } from '../hooks';
-import { updateMemberships, updateCurrentBlock, updateLatestBlock } from '../store/memberships';
+import { updateMemberships } from '../store/memberships';
 
 import '../sass/index.scss';
 
@@ -17,32 +17,18 @@ const Index: FunctionComponent = () => {
     const dispatch = useDispatch();
     const memberships = useSelector(state => state.memberships.memberships);
     const updated = useSelector(state => state.memberships.updated);
-    const currentBlocks = useSelector(state => state.memberships.currentBlocks);
-    const latestBlocks = useSelector(state => state.memberships.latestBlocks);
     const [loading, setLoading] = useState(false);
 
     const updateData = () => {
         setLoading(true);
-        getBlocks().then(blocks => {
-            const latestBlocksNew: any = {};
-            blocks.forEach(block => {
-                latestBlocksNew[block.network] = block.block;
-                dispatch(updateLatestBlock(block.network, block.block));
-            });
+       
             getMemberships(
-                currentBlocks,
-                latestBlocksNew,
                 newMemberships => {
                     dispatch(updateMemberships(newMemberships));
                 },
-                (newNetwork, newBlock) => {
-                    dispatch(updateCurrentBlock(newNetwork, newBlock));
-                }
-            ).then(result => {
+            ).then(() => {
                 setLoading(false);
             });
-            //getMembershipsV2();
-        });
     };
 
     if (!loading && Date.now() - updated > 30 * 1000) {
