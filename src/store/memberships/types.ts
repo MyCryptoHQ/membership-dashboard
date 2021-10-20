@@ -21,4 +21,7 @@ export interface UpdateMembershipsAction extends Action {
     memberships: Membership[];
 }
 
-export type MembershipsActions = UpdateMembershipsAction;
+
+
+export type MembershipsActions =
+    | UpdateMembershipsAction;

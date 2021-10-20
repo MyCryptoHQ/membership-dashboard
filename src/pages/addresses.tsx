@@ -1,48 +1,71 @@
-import React, { FunctionComponent, useState, createRef } from 'react';
+import React, { FunctionComponent, createRef, Fragment } from 'react';
 import { Link } from 'gatsby';
 import Layout from '../components/Layout';
 import MetaData from '../components/MetaData';
 import Address from '../components/Address';
 import { Row, Col, Table, Input, Button, Icon, Typography } from 'antd';
-import { getMemberships } from '../utils/membership';
-import { useDispatch, useSelector } from '../hooks';
-import { updateMemberships } from '../store/memberships';
+import { useSelector } from '../hooks';
+import networks from '../data/networks';
+import { memberships as contracts } from '../data/contracts';
+import fileDownload from 'js-file-download';
 
 import '../sass/index.scss';
 
 const { Title } = Typography;
+
+const downloadCSV = (addressData) => {
+    const activeMemberships = addressData.filter(address => address.active);
+    const rows = activeMemberships.map(activeMembership => [activeMembership.network, activeMembership.address, activeMembership.type]);
+    
+    const csvContent = rows.map(e => e.join(",")).join("\n");
+
+    fileDownload(csvContent, 'export.csv');
+}
 
 interface AddressMap {
     [key: string]: any;
 }
 
 const Transactions: FunctionComponent = () => {
-    const dispatch = useDispatch();
     const memberships = useSelector(state => state.memberships.memberships);
-    const updated = useSelector(state => state.memberships.updated);
-    const [loading, setLoading] = useState(false);
     const searchInput: any = createRef();
-
-    const updateData = () => {
-        setLoading(true);
-        getMemberships().then(result => {
-            dispatch(updateMemberships(result));
-            setLoading(false);
-        });
-    };
-
-    if (!loading && Date.now() - updated > 30 * 1000) {
-        updateData();
-    }
 
     const addresses: AddressMap = {};
 
     memberships.forEach(membership => {
-        if (!(membership.address in addresses)) {
-            addresses[membership.address] = [];
+        const id = `${membership.network}-${membership.address}`;
+        if (!(id in addresses)) {
+            addresses[id] = [];
         }
-        addresses[membership.address].push(membership);
+        addresses[id].push(membership);
     });
+
+    const addressData = Object.values(addresses)
+    .map((addressMemberships: any, index) => {
+        let highestMembershipName = '';
+        let highestMembershipDuration = 0;
+        addressMemberships.forEach(addressMembership => {
+            if(addressMembership.expiration > Date.now()) {
+                const membershipType: any = contracts.find(contract => contract.contractAddress.toLowerCase() === addressMembership.contractAddress.toLowerCase());
+                if(membershipType.durationInDays > highestMembershipDuration) {
+                    highestMembershipDuration = membershipType.durationInDays;
+                    highestMembershipName = membershipType.name;
+                }
+            }
+        })
+        return {
+            key: index,
+            address: addressMemberships[0].address,
+            network: addressMemberships[0].network,
+            active: addressMemberships.some(
+                addressMembership =>
+                    addressMembership.expiration > Date.now()
+            ),
+            type: highestMembershipName,
+            count: addressMemberships.length.toString()
+        };
+    })
+    .sort((a, b) => a.address.localeCompare(b.address));
 
     return (
         <Layout>
@@ -50,14 +73,13 @@ const Transactions: FunctionComponent = () => {
             <Row>
                 <Col offset={2} span={20}>
                     <Title level={2}>Addresses</Title>
-                    <Button
-                        style={{ position: 'absolute', right: 0, top: 0 }}
-                        shape="circle"
-                        icon="reload"
-                        loading={loading}
-                        disabled={loading}
-                        onClick={updateData}
-                    />
+                    <span style={{ position: 'absolute', right: 0, top: 0 }}>
+                        <Button
+                            shape="circle"
+                            icon="download"
+                            onClick={() => downloadCSV(addressData)}
+                        />
+                    </span>
                     <Table
                         columns={[
                             {
@@ -121,9 +143,36 @@ const Transactions: FunctionComponent = () => {
                                     }
                                 },
 
-                                render: (address, record) => (
-                                    <Address network={record.network} address={address} />
-                                )
+                                render: (address, record) => <Address address={address} network={record.network} />
+                            },
+                            {
+                                title: 'Network',
+                                dataIndex: 'network',
+                                filters: networks.map(network => {
+                                    return {
+                                        text: network.name,
+                                        value: network.id
+                                    };
+                                }),
+                                onFilter: (value, entry) => entry.network === value,
+                                render: network => {
+                                    const networkData = networks.find(item => item.id === network);
+                                    if (!networkData) {
+                                        return <Fragment />;
+                                    }
+                                    return (
+                                        <Row type="flex" justify="space-around">
+                                            <Col span={6}>
+                                                <img
+                                                    width="20px"
+                                                    height="20px"
+                                                    src={networkData.icon}
+                                                />
+                                            </Col>
+                                            <Col span={18}>{networkData.name}</Col>
+                                        </Row>
+                                    );
+                                }
                             },
                             {
                                 title: 'Active',
@@ -181,21 +230,7 @@ const Transactions: FunctionComponent = () => {
                                 )
                             }
                         ]}
-                        dataSource={Object.keys(addresses)
-                            .map((address, index) => {
-                                const addressMemberships = addresses[address];
-                                return {
-                                    key: index,
-                                    address,
-                                    network: 'mainnet' as any,
-                                    active: addressMemberships.some(
-                                        addressMembership =>
-                                            addressMembership.expiration * 1000 > Date.now()
-                                    ),
-                                    count: addressMemberships.length.toString()
-                                };
-                            })
-                            .sort((a, b) => a.address.localeCompare(b.address))}
+                        dataSource={addressData}
                     />
                 </Col>
             </Row>

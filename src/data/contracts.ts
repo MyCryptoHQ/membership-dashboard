@@ -4,7 +4,7 @@ import sixMonthsIcon from '../images/membership-sixmonths.svg';
 import twelveMonthsIcon from '../images/membership-twelvemonths.svg';
 import lifetimeIcon from '../images/membership-lifetime.svg';
 
-export type Network = 'mainnet' | 'xdai';
+export type Network = 'mainnet' | 'xdai' | 'polygon';
 
 export interface Membership {
     network: Network;
@@ -26,10 +26,18 @@ export const memberships: Membership[] = [
     },
     {
         network: 'xdai',
-        title: '1 month (xDai)',
-        name: 'One Month Membership (xDai)',
+        title: '1 month',
+        name: 'One Month Membership',
         icon: oneMonthIcon,
         contractAddress: '0xcB3BB4CCe15b492E7fdD7cb9a3835C034714207A',
+        durationInDays: 30
+    },
+    {
+        network: 'polygon',
+        title: '1 month',
+        name: 'One Month Membership',
+        icon: oneMonthIcon,
+        contractAddress: '0x54d0be5C24e183EF4247c5C1a426A6838696ED88',
         durationInDays: 30
     },
     {
@@ -58,10 +66,18 @@ export const memberships: Membership[] = [
     },
     {
         network: 'xdai',
-        title: '12 months (xDai)',
-        name: 'Twelve Month Membership (xDai)',
+        title: '12 months',
+        name: 'Twelve Month Membership',
         icon: twelveMonthsIcon,
         contractAddress: '0xf97f516Cc0700a4Ce9Ee64D488F744f631e1525d',
+        durationInDays: 366
+    },
+    {
+        network: 'polygon',
+        title: '12 months',
+        name: 'Twelve Month Membership',
+        icon: twelveMonthsIcon,
+        contractAddress: '0x46522c5a1018E13E40e3117191200e4CF6039241',
         durationInDays: 366
     },
     {
@@ -74,10 +90,18 @@ export const memberships: Membership[] = [
     },
     {
         network: 'xdai',
-        title: 'I 💖 MyCrypto (xDai)',
-        name: 'Lifetime Membership (xDai)',
+        title: 'I 💖 MyCrypto',
+        name: 'Lifetime Membership',
         icon: lifetimeIcon,
         contractAddress: '0xEB24302c4c78963e1b348b274aa9cC6fcbe80527',
+        durationInDays: 36500
+    },
+    {
+        network: 'polygon',
+        title: 'I 💖 MyCrypto',
+        name: 'Lifetime Membership',
+        icon: lifetimeIcon,
+        contractAddress: '0xf6df8A1cD9Da0d4b0c63Ae55BEc7A8566384C11C',
         durationInDays: 36500
     }
 ];

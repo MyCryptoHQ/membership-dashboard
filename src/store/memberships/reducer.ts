@@ -1,5 +1,9 @@
 import { Reducer } from 'redux';
-import { UPDATE_MEMBERSHIPS, MembershipsActions, MembershipsState } from './types';
+import {
+    UPDATE_MEMBERSHIPS,
+    MembershipsActions,
+    MembershipsState
+} from './types';
 
 const INITIAL_STATE: MembershipsState = {
     memberships: [],

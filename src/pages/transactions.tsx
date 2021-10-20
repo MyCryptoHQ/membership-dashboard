@@ -1,13 +1,11 @@
-import React, { FunctionComponent, useState, createRef } from 'react';
+import React, { FunctionComponent, useState, createRef, Fragment } from 'react';
 import Layout from '../components/Layout';
 import MetaData from '../components/MetaData';
-import ExternalLink from '../components/ExternalLink';
 import Address from '../components/Address';
 import { Row, Col, Table, Input, Button, Icon, Typography } from 'antd';
-import { getMemberships } from '../utils/membership';
 import { memberships as membershipTypes } from '../data/contracts';
-import { useDispatch, useSelector } from '../hooks';
-import { updateMemberships } from '../store/memberships';
+import networks from '../data/networks';
+import { useSelector } from '../hooks';
 
 import moment from 'moment';
 
@@ -16,27 +14,12 @@ import '../sass/index.scss';
 const { Title } = Typography;
 
 const Transactions: FunctionComponent = () => {
-    const dispatch = useDispatch();
     const memberships = useSelector(state => state.memberships.memberships);
-    const updated = useSelector(state => state.memberships.updated);
-    const [loading, setLoading] = useState(false);
     const [hashSearch, setHashSearch] = useState(false);
     const [searchText, setSearchText] = useState('');
     const searchInput: any = createRef();
     const isSSR = typeof window === 'undefined';
     const hash = !isSSR ? location.hash.replace('#', '') : '';
-
-    const updateData = () => {
-        setLoading(true);
-        getMemberships().then(result => {
-            dispatch(updateMemberships(result));
-            setLoading(false);
-        });
-    };
-
-    if (!loading && Date.now() - updated > 30 * 1000) {
-        updateData();
-    }
 
     const handleSearch = (selectedKeys, confirm) => {
         confirm();
@@ -67,17 +50,46 @@ const Transactions: FunctionComponent = () => {
             <Row>
                 <Col offset={2} span={20}>
                     <Title level={2}>Transactions</Title>
-                    <Button
+                    {/*<Button
                         style={{ position: 'absolute', right: 0, top: 0 }}
                         shape="circle"
                         icon="reload"
                         loading={loading}
                         disabled={loading}
                         onClick={updateData}
-                    />
+                    />*/}
                     <Table
                         columns={[
                             {
+                                title: 'Network',
+                                dataIndex: 'network',
+                                filters: networks.map(network => {
+                                    return {
+                                        text: network.name,
+                                        value: network.id
+                                    };
+                                }),
+                                onFilter: (value, entry) => entry.network === value,
+                                render: network => {
+                                    const networkData = networks.find(item => item.id === network);
+                                    if (!networkData) {
+                                        return <Fragment />;
+                                    }
+                                    return (
+                                        <Row type="flex" justify="space-around">
+                                            <Col span={6}>
+                                                <img
+                                                    width="20px"
+                                                    height="20px"
+                                                    src={networkData.icon}
+                                                />
+                                            </Col>
+                                            <Col span={18}>{networkData.name}</Col>
+                                        </Row>
+                                    );
+                                }
+                            },
+                            /*{
                                 title: 'Transaction',
                                 dataIndex: 'transactionHash',
                                 render: (transactionhash, record) => (
@@ -91,7 +103,7 @@ const Transactions: FunctionComponent = () => {
                                         {transactionhash.substr(0, 12)}...
                                     </ExternalLink>
                                 )
-                            },
+                            },*/
                             {
                                 title: 'Address',
                                 dataIndex: 'address',
@@ -162,6 +174,10 @@ const Transactions: FunctionComponent = () => {
                                 title: 'Membership',
                                 dataIndex: 'contractAddress',
                                 filters: membershipTypes.map(membershipType => {
+                                    const networkData = networks.find(
+                                        item => item.id === membershipType.network
+                                    );
+                                    const networkName = networkData ? networkData.name : 'Unknown';
                                     const text = (
                                         <>
                                             <img
@@ -169,7 +185,7 @@ const Transactions: FunctionComponent = () => {
                                                 height="16px"
                                                 src={membershipType.icon}
                                             />{' '}
-                                            {membershipType.title}
+                                            {membershipType.title} ({networkName})
                                         </>
                                     );
                                     return {
@@ -177,10 +193,13 @@ const Transactions: FunctionComponent = () => {
                                         value: membershipType.contractAddress
                                     };
                                 }),
-                                onFilter: (value, entry) => entry.contractAddress === value,
+                                onFilter: (value, entry) =>
+                                    entry.contractAddress.toLowerCase() === value.toLowerCase(),
                                 render: contractAddress => {
                                     const type: any = membershipTypes.find(
-                                        membership => membership.contractAddress === contractAddress
+                                        membership =>
+                                            membership.contractAddress.toLowerCase() ===
+                                            contractAddress.toLowerCase()
                                     );
                                     if (type) {
                                         return (
@@ -232,14 +251,14 @@ const Transactions: FunctionComponent = () => {
                             {
                                 title: 'Date',
                                 dataIndex: 'timestamp',
-                                render: timestamp => moment(timestamp * 1000).format('LL'),
+                                render: timestamp => moment(timestamp).format('LL'),
                                 sorter: (a, b) => b.timestamp - a.timestamp
                             }
                         ]}
                         dataSource={memberships
                             .map((membership: any, index) => {
                                 membership.key = index;
-                                membership.active = membership.expiration * 1000 > Date.now();
+                                membership.active = membership.expiration > Date.now();
                                 return membership;
                             })
                             .sort((a, b) => b.timestamp - a.timestamp)}
